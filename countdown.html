@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>countdown-dashboard</title>
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+    <script>
+        $().ready(function(){
+            var amount = parseInt($("#amount").val());
+            var rate = 0;
+            var minute = 0;
+            var second = 0;
+            var time = 0;
+
+            var intervalAmount;
+            var intervalTime;
+
+            var url = new URL(window.location.href);
+            var team = url.searchParams.get("team");
+            $("#title").html("Team " + team);
+
+            $("#start-button").click(function(){
+                amount = parseInt($("#amount").val());
+                rate = parseInt($("#rate").val());
+                minute = parseInt($("#minute").val());
+                second = parseInt($("#second").val());
+                time = minute * 60 + second;
+
+                intervalAmount = setInterval(function(){
+                    amount = amount - rate >= 0 ? amount - rate : 0;
+                    $("#amount").val(amount);
+                },60*1000);
+
+                intervalTime = setInterval(function(){
+                    time = time - 1 >=0 ? time - 1 : 0;
+                    minute = Math.floor(time/60);
+                    second = Math.floor(time%60);
+                    $("#minute").val(minute);
+                    $("#second").val(second);
+
+                    if(time <= 0 || amount <= 0){
+                        clearInterval(intervalAmount);
+                        clearInterval(intervalTime);
+                        $("#title").html("Team " + team + " END!");
+                    }
+                },1000);
+            });
+
+            $("#stop-button").click(function(){
+                clearInterval(intervalAmount);
+                clearInterval(intervalTime);
+            });
+
+            $("#rate-button").click(function(){
+                rate = parseInt($("#rate").val());
+            });
+
+            $("#invest-button").click(function(){
+                var invest = parseInt($("#invest").val());
+                amount += invest;
+                $("#amount").val(amount);
+            });
+        });
+    </script>
+    <style>
+        div {
+            border: 1px #000000 solid;
+        }
+        input.number {
+            font-size: large;
+        }
+    </style>
+</head>
+<body>
+<h1 id="title">Team</h1>
+<div name="countdown">
+    <h1><input class="number" type="number" id="amount" min="0" max="200" value="150" step="10"> millions left</h1>
+    <h1>
+        <input class="number" type="number" id="minute" min="0" max="20" value="20" step="5">
+        :<input class="number" type="number" id="second" min="0" max="59" value="0" step="1">
+        minutes left
+    </h1>
+    <p>
+        <input type="button" value="start" id="start-button"/>
+        <input type="button" value="stop" id="stop-button"/>
+    </p>
+</div>
+<div name="burndown-rate">
+    <p>burn-down rate:
+        <input type="number" id="rate" min="0" max="100" value="10">
+        million dollars per minute
+        <input type="button" value="set" id="rate-button"/>
+    </p>
+</div>
+<div name="new-investment">
+    <p>invest
+        <input type="number" id="invest" min="0" max="1500" value="10" step="10">
+        million dollars
+        <input type="button" value="invest" id="invest-button"/>
+    </p>
+</div>
+</body>
+</html>
